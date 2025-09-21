@@ -3,13 +3,24 @@ import subprocess
 import os
 import datetime
 import csv
-import urllib.parse # Import the urllib.parse module
+import platform
+import urllib.parse
 
 app = Flask(__name__)
 
-JMETER_PATH = r"C:\\Users\\apache-jmeter-5.6.3\\bin\\jmeter.bat"
-JMX_FILE = r"C:\\Users\\apache-jmeter-5.6.3\\bin\\examples\\test-website.jmx"
-RESULTS_DIR = r"C:\\Users\\apache-jmeter-5.6.3\\bin\\examples"
+# Get absolute path to project folder
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# JMeter relative paths
+JMETER_BIN = os.path.join(BASE_DIR, "apache-jmeter-5.6.3", "bin")
+if platform.system() == "Windows":
+    JMETER_PATH = os.path.join(JMETER_BIN, "jmeter.bat")
+else:
+    JMETER_PATH = os.path.join(JMETER_BIN, "jmeter")
+    os.chmod(JMETER_PATH, 0o755)  # Ensure executable permission on Linux
+
+JMX_FILE = os.path.join(BASE_DIR, "test-website.jmx")
+RESULTS_DIR = os.path.join(BASE_DIR, "results")
 
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
@@ -23,18 +34,17 @@ def run_jmeter():
     if not url:
         return jsonify({"status": "error", "message": "No URL provided."})
 
-    # Use urllib.parse to split the URL into components
+    # Parse URL
     parsed_url = urllib.parse.urlparse(url)
     protocol = parsed_url.scheme
     host = parsed_url.netloc
-    path = parsed_url.path
-    if not path:
-        path = "/"
+    path = parsed_url.path or "/"
 
-    # Generate a unique results file name to avoid conflicts
+    # Generate unique results file name
     timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
     results_file = os.path.join(RESULTS_DIR, f"results_{timestamp}.csv")
     
+    # Build JMeter command
     jmeter_command = [
         JMETER_PATH,
         "-n",
@@ -46,10 +56,10 @@ def run_jmeter():
     ]
 
     try:
-        # Run the JMeter command
+        # Run JMeter
         result = subprocess.run(jmeter_command, capture_output=True, text=True)
         
-        # Read the generated CSV file and summarize results
+        # Summarize CSV results
         total = success = error = 0
         if os.path.exists(results_file):
             with open(results_file, newline="") as csvfile:
