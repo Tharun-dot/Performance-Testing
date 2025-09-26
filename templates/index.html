@@ -1,521 +1,629 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Selva Analyser | Performance Testing</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-  <style>
-    /* CSS Variables for easy theme management */
-    :root {
-      --font-heading: 'Orbitron', sans-serif;
-      --font-body: 'Inter', sans-serif;
-      --color-bg: #0d0d1e;
-      --color-bg-dark: rgba(7, 7, 20, 0.7);
-      --color-primary: #764ba2;
-      --color-secondary: #4f0356ff;
-      --color-text: #e6e6e6;
-      --color-text-light: #b0b0b0;
-      --color-card-bg: rgba(255, 255, 255, 0.04);
-      --border-radius: 12px;
-      --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Performance Analyser | Performance Testing</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      /* CSS Variables for easy theme management */
+      :root {
+        --font-heading: "Orbitron", sans-serif;
+        --font-body: "Inter", sans-serif;
+        --color-bg: #0d0d1e;
+        --color-bg-dark: rgba(7, 7, 20, 0.7);
+        --color-primary: #764ba2;
+        --color-secondary: #4f0356ff;
+        --color-text: #e6e6e6;
+        --color-text-light: #b0b0b0;
+        --color-card-bg: rgba(255, 255, 255, 0.04);
+        --border-radius: 12px;
+        --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      }
 
-    /* --- Loading Page Styles --- */
-    #loader-wrapper {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--color-bg-dark);
-      z-index: 2000;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      transition: opacity 0.5s ease-in-out;
-    }
-
-    .loader {
-      border: 4px solid rgba(255, 255, 255, 0.2);
-      border-top: 4px solid var(--color-secondary);
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      animation: spin 1.2s linear infinite;
-    }
-
-    .loader-text {
-      margin-top: 20px;
-      color: var(--color-text-light);
-      font-family: var(--font-body);
-      font-size: 1.2rem;
-      letter-spacing: 2px;
-    }
-
-    .hidden {
-      opacity: 0;
-      visibility: hidden;
-    }
-    
-    body {
-      font-family: var(--font-body);
-      background-color: var(--color-bg);
-      background-image: url('back.jpeg'); 
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
-      background-repeat: no-repeat;
-      color: var(--color-text);
-      margin: 0;
-      overflow-x: hidden;
-      line-height: 1.6;
-    }
-
-    /* --- Utilities and Global Styles --- */
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 2rem;
-    }
-
-    h1, h2, h3 {
-      font-family: var(--font-heading);
-      letter-spacing: 1px;
-    }
-
-    h2 {
-      font-size: 2.5rem;
-      text-transform: uppercase;
-      text-align: center;
-      margin-bottom: 1rem;
-    }
-
-    h3 {
-      font-size: 1.5rem;
-    }
-
-    /* --- Background Overlay for better readability --- */
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: -1;
-    }
-
-    /* --- Navbar --- */
-    .navbar {
-      background: var(--color-bg-dark);
-      padding: 1.2rem 2rem;
-      box-shadow: var(--box-shadow);
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .navbar .logo {
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--color-text);
-      letter-spacing: 3px;
-    }
-    .navbar .menu {
-      display: flex;
-      gap: 2rem;
-    }
-    .navbar .menu a {
-      text-decoration: none;
-      color: var(--color-text);
-      font-size: 1rem;
-      position: relative;
-      transition: color 0.3s;
-    }
-    .navbar .menu a::after {
-      content: '';
-      position: absolute;
-      width: 0;
-      height: 2px;
-      bottom: -5px;
-      left: 0;
-      background-color: var(--color-secondary);
-      transition: width 0.3s ease-in-out;
-    }
-    .navbar .menu a:hover {
-      color: var(--color-secondary);
-    }
-    .navbar .menu a:hover::after {
-      width: 100%;
-    }
-
-    /* --- Hero Section --- */
-    .hero {
-      min-height: 80vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 4rem 0 3rem;
-      position: relative;
-    }
-    .hero h1 {
-      padding-bottom:4px;
-      font-size: 3.5rem;
-      color: #fff;
-      text-shadow: 0 0 10px rgba(118, 75, 162, 0.5);
-    }
-    .hero p {
-      max-width: 800px;
-      margin: 1rem auto 2rem;
-      font-size: 1.1rem;
-      color: var(--color-text-light);
-    }
-
-    /* --- Test Form Section --- */
-    .test-form-section {
-      background: rgba(0,0,0,0.4);
-      backdrop-filter: blur(10px);
-      padding: 3rem 0;
-    }
-    .test-form-card {
-      background: var(--color-card-bg);
-      padding: 2rem;
-      border-radius: var(--border-radius);
-      border: 1px solid var(--color-primary);
-      max-width: 90%;
-      margin: 0 auto;
-      box-shadow: 0 0 25px rgba(118, 75, 162, 0.3);
-      text-align: center;
-    }
-    .test-form-card input[type="text"] {
-      width: calc(100% - 24px);
-      padding: 12px;
-      margin: 1rem 0;
-      border-radius: var(--border-radius);
-      border: 1px solid var(--color-primary);
-      background: rgba(255, 255, 255, 0.05);
-      color: #fff;
-      outline: none;
-      font-size: 1rem;
-      transition: all 0.3s;
-    }
-    .test-form-card input[type="text"]:focus {
-      border-color: var(--color-secondary);
-      box-shadow: 0 0 10px var(--color-secondary);
-    }
-
-    .btn-submit {
-      background: linear-gradient(45deg, var(--color-primary), #a24b91);
-      border: none;
-      padding: 14px 30px;
-      border-radius: 50px;
-      color: white;
-      font-size: 1.1rem;
-      cursor: pointer;
-      transition: all 0.3s;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-weight: 700;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    }
-    .btn-submit:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(118, 75, 162, 0.4);
-    }
-
-    /* --- Results and Loading --- */
-    #output {
-      margin-top: 2rem;
-      min-height: 150px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .results-card {
-      background: var(--color-card-bg);
-      border-radius: var(--border-radius);
-      padding: 1.5rem;
-      border: 1px solid var(--color-secondary);
-      box-shadow: 0 0 25px rgba(0, 255, 224, 0.3);
-      text-align: left;
-      width: 100%;
-    }
-    .results-card h3 {
-      text-align: center;
-      margin-top: 0;
-      border-bottom: 2px solid var(--color-secondary);
-      padding-bottom: 10px;
-    }
-    .results-card .stats p {
-      margin: 10px 0;
-      font-size: 1rem;
-      display: flex;
-      justify-content: space-between;
-    }
-    .results-card .stats p b {
-      color: var(--color-secondary);
-    }
-    .download-link {
-      display: block;
-      width: fit-content;
-      margin: 1rem auto 0;
-      color: var(--color-secondary);
-      text-decoration: none;
-      font-weight: bold;
-      transition: color 0.3s;
-    }
-    .download-link:hover {
-      text-shadow: 0 0 8px var(--color-secondary);
-    }
-    .loading {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      color: var(--color-secondary);
-      font-size: 1.2rem;
-    }
-    .loading i {
-      animation: spin 2s linear infinite;
-    }
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-    .error {
-      color: #ff4d4d;
-      text-align: center;
-    }
-
-    /* --- Features Section --- */
-    .features-section {
-      padding: 5rem 0;
-    }
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
-      margin-top: 3rem;
-    }
-    .feature-card {
-      background: var(--color-card-bg);
-      padding: 2rem;
-      border-radius: var(--border-radius);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      text-align: center;
-      transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-    }
-    .feature-card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 10px 30px rgba(118, 75, 162, 0.3);
-    }
-    .feature-card i {
-      font-size: 3rem;
-      color: var(--color-primary);
-      margin-bottom: 1rem;
-    }
-    .feature-card h3 {
-      font-size: 1.2rem;
-      color: #fff;
-    }
-    .feature-card p {
-      color: var(--color-text-light);
-      font-size: 0.9rem;
-    }
-
-    /* --- Footer --- */
-    footer {
-      text-align: center;
-      padding: 2rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      margin-top: 3rem;
-      color: var(--color-text-light);
-    }
-    footer a {
-      color: var(--color-secondary);
-      text-decoration: none;
-    }
-    
-    /* Responsive Design */
-    @media (max-width: 768px) {
-      .navbar {
+      /* --- Loading Page Styles --- */
+      #loader-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--color-bg-dark);
+        z-index: 2000;
+        display: flex;
         flex-direction: column;
-        gap: 1rem;
-        padding: 1rem;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 0.5s ease-in-out;
+      }
+
+      .loader {
+        border: 4px solid rgba(255, 255, 255, 0.2);
+        border-top: 4px solid var(--color-secondary);
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1.2s linear infinite;
+      }
+
+      .loader-text {
+        margin-top: 20px;
+        color: var(--color-text-light);
+        font-family: var(--font-body);
+        font-size: 1.2rem;
+        letter-spacing: 2px;
+      }
+
+      .hidden {
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      body {
+        font-family: var(--font-body);
+        background-color: var(--color-bg);
+        background-image: url("back.jpeg");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+        color: var(--color-text);
+        margin: 0;
+        overflow-x: hidden;
+        line-height: 1.6;
+      }
+
+      /* --- Utilities and Global Styles --- */
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+      }
+
+      h1,
+      h2,
+      h3 {
+        font-family: var(--font-heading);
+        letter-spacing: 1px;
+      }
+
+      h2 {
+        font-size: 2.5rem;
+        text-transform: uppercase;
+        text-align: center;
+        margin-bottom: 1rem;
+      }
+
+      h3 {
+        font-size: 1.5rem;
+      }
+
+      /* --- Background Overlay for better readability --- */
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: -1;
+      }
+
+      /* --- Navbar --- */
+      .navbar {
+        background: var(--color-bg-dark);
+        padding: 1.2rem 2rem;
+        box-shadow: var(--box-shadow);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .navbar .logo {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--color-text);
+        letter-spacing: 3px;
       }
       .navbar .menu {
-        gap: 1rem;
+        display: flex;
+        gap: 2rem;
+      }
+      .navbar .menu a {
+        text-decoration: none;
+        color: var(--color-text);
+        font-size: 1rem;
+        position: relative;
+        transition: color 0.3s;
+      }
+      .navbar .menu a::after {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: -5px;
+        left: 0;
+        background-color: var(--color-secondary);
+        transition: width 0.3s ease-in-out;
+      }
+      .navbar .menu a:hover {
+        color: var(--color-secondary);
+      }
+      .navbar .menu a:hover::after {
+        width: 100%;
+      }
+
+      /* --- Hero Section --- */
+      .hero {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 4rem 0 3rem;
+        position: relative;
       }
       .hero h1 {
-        font-size: 2.5rem;
+        padding-bottom: 4px;
+        font-size: 3.5rem;
+        color: #fff;
+        text-shadow: 0 0 10px rgba(118, 75, 162, 0.5);
       }
-      h2 {
-        font-size: 2rem;
+      .hero p {
+        max-width: 800px;
+        margin: 1rem auto 2rem;
+        font-size: 1.1rem;
+        color: var(--color-text-light);
       }
-    }
-  </style>
-</head>
-<body>
-  <div id="loader-wrapper">
-    <div class="loader"></div>
-    <div class="loader-text">Loading...</div>
-  </div>
 
-  <header class="navbar">
-    <div class="logo">Selva Analyser</div> 
-    <nav class="menu">
-      <a href="#home">Home</a>
-      <a href="#features">Features</a>
-      <a href="#how-it-works">How It Works</a>
-      <a href="#contacts">Contact</a>
-    </nav>
-  </header>
+      /* --- Test Form Section --- */
+      .test-form-section {
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(10px);
+        padding: 3rem 0;
+      }
+      .test-form-card {
+        background: var(--color-card-bg);
+        padding: 2rem;
+        border-radius: var(--border-radius);
+        border: 1px solid var(--color-primary);
+        max-width: 90%;
+        margin: 0 auto;
+        box-shadow: 0 0 25px rgba(118, 75, 162, 0.3);
+        text-align: center;
+      }
+      .test-form-card input[type="text"] {
+        width: calc(100% - 24px);
+        padding: 12px;
+        margin: 1rem 0;
+        border-radius: var(--border-radius);
+        border: 1px solid var(--color-primary);
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+        outline: none;
+        font-size: 1rem;
+        transition: all 0.3s;
+      }
+      .test-form-card input[type="text"]:focus {
+        border-color: var(--color-secondary);
+        box-shadow: 0 0 10px var(--color-secondary);
+      }
 
-  <main>
-    <section id="home" class="hero">
-      <div class="container">
-        <h1>Optimize Your Site. Maximize Your Impact.</h1>
-        <p>Selva Analyser provides instant, AI-powered performance testing to identify bottlenecks and ensure your site delivers an exceptional user experience, every time.</p>
-        <a href="#test-form" class="btn-submit">Run a Free Test Now</a>
-      </div>
-    </section>
+      .btn-submit {
+        background: linear-gradient(45deg, var(--color-primary), #a24b91);
+        border: none;
+        padding: 14px 30px;
+        border-radius: 50px;
+        color: white;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 700;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+      .btn-submit:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(118, 75, 162, 0.4);
+      }
 
-    <section id="test-form" class="test-form-section">
-      <div class="container">
-        <div class="test-form-card">
-          <h2>Performance Test Runner</h2>
-          <p>Enter a URL below to run a quick performance test and get real-time insights.</p>
-          <form id="jmeterForm">
-            <input type="text" id="url" placeholder="Enter website URL (e.g. https://example.com)" required />
-            <button type="submit" class="btn-submit">
-              <i class="fas fa-rocket"></i> Run Test
-            </button>
-          </form>
-          <div id="output"></div>
-        </div>
-      </div>
-    </section>
+      /* --- Results and Loading --- */
+      #output {
+        margin-top: 2rem;
+        min-height: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .results-card {
+        background: var(--color-card-bg);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        border: 1px solid var(--color-secondary);
+        box-shadow: 0 0 25px rgba(0, 255, 224, 0.3);
+        text-align: left;
+        width: 100%;
+      }
+      .results-card h3 {
+        text-align: center;
+        margin-top: 0;
+        border-bottom: 2px solid var(--color-secondary);
+        padding-bottom: 10px;
+      }
+      .results-card .stats p {
+        margin: 10px 0;
+        font-size: 1rem;
+        display: flex;
+        justify-content: space-between;
+      }
+      .results-card .stats p b {
+        color: var(--color-secondary);
+      }
+      .download-link {
+        display: block;
+        width: fit-content;
+        margin: 1rem auto 0;
+        color: var(--color-secondary);
+        text-decoration: none;
+        font-weight: bold;
+        transition: color 0.3s;
+      }
+      .download-link:hover {
+        text-shadow: 0 0 8px var(--color-secondary);
+      }
+      .loading {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        color: var(--color-secondary);
+        font-size: 1.2rem;
+      }
+      .loading i {
+        animation: spin 2s linear infinite;
+      }
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .error {
+        color: #ff4d4d;
+        text-align: center;
+      }
 
-    <section id="features" class="features-section">
-      <div class="container">
-        <h2>Why Selva Analyser?</h2> 
-        <div class="features-grid">
-          <div class="feature-card">
-            <i class="fas fa-tachometer-alt"></i>
-            <h3>Blazing Fast</h3>
-            <p>Get comprehensive performance metrics in seconds, not minutes. Our optimized engine provides rapid feedback.</p>
-          </div>
-          <div class="feature-card">
-            <i class="fas fa-chart-line"></i>
-            <h3>Detailed Reporting</h3>
-            <p>Receive a full breakdown of total requests, success rates, and errors to pinpoint exactly where performance issues exist.</p>
-          </div>
-          <div class="feature-card">
-            <i class="fas fa-file-download"></i>
-            <h3>Downloadable Reports</h3>
-            <p>Download a detailed CSV report of your test results for in-depth analysis and sharing with your team.</p>
-          </div>
-        </div>
-      </div>
-    </section>
+      /* --- Features Section --- */
+      .features-section {
+        padding: 5rem 0;
+      }
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+      }
+      .feature-card {
+        background: var(--color-card-bg);
+        padding: 2rem;
+        border-radius: var(--border-radius);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        text-align: center;
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+      }
+      .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 30px rgba(118, 75, 162, 0.3);
+      }
+      .feature-card i {
+        font-size: 3rem;
+        color: var(--color-primary);
+        margin-bottom: 1rem;
+      }
+      .feature-card h3 {
+        font-size: 1.2rem;
+        color: #fff;
+      }
+      .feature-card p {
+        color: var(--color-text-light);
+        font-size: 0.9rem;
+      }
 
-    <section id="how-it-works" class="features-section">
-      <div class="container">
-        <h2>How It Works</h2>
-        <div class="features-grid">
-          <div class="feature-card">
-            <i class="fas fa-1"></i>
-            <h3>Enter URL</h3>
-            <p>Simply paste the URL of the website or endpoint you want to test into the field above.</p>
-          </div>
-          <div class="feature-card">
-            <i class="fas fa-2"></i>
-            <h3>Run Test</h3>
-            <p>Our server-side engine executes a rapid, simulated load test against your URL.</p>
-          </div>
-          <div class="feature-card">
-            <i class="fas fa-3"></i>
-            <h3>Analyze Results</h3>
-            <p>Instantly view key performance metrics on the page or download the full report for a detailed look.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
+      /* --- Footer --- */
+      footer {
+        text-align: center;
+        padding: 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        margin-top: 3rem;
+        color: var(--color-text-light);
+      }
+      footer a {
+        color: var(--color-secondary);
+        text-decoration: none;
+      }
 
-  <footer>
-    <div class="container">
-      <p>&copy; 2025 Selva Analyser. All rights reserved. | <a href="#">Privacy Policy</a></p> 
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .navbar {
+          flex-direction: column;
+          gap: 1rem;
+          padding: 1rem;
+        }
+        .navbar .menu {
+          gap: 1rem;
+        }
+        .hero h1 {
+          font-size: 2.5rem;
+        }
+        h2 {
+          font-size: 2rem;
+        }
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    </head>
+  <body>
+    <div id="loader-wrapper">
+      <div class="loader"></div>
+      <div class="loader-text">Loading...</div>
     </div>
-  </footer>
 
-  <script>
-    window.addEventListener('load', () => {
-      const loaderWrapper = document.getElementById('loader-wrapper');
-      loaderWrapper.classList.add('hidden');
-      loaderWrapper.addEventListener('transitionend', () => {
-        loaderWrapper.remove();
-      });
-    });
+    <header class="navbar">
+      <div class="logo">Performance Analyser</div>
+      <nav class="menu">
+        <a href="#home">Home</a>
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#contacts">Contact</a>
+      </nav>
+    </header>
 
-    const form = document.getElementById("jmeterForm");
-    const outputDiv = document.getElementById("output");
+    <main>
+      <section id="home" class="hero">
+        <div class="container">
+          <h1>Optimize Your Site. Maximize Your Impact.</h1>
+          <p>
+            Performance Analyser provides instant, AI-powered performance
+            testing to identify bottlenecks and ensure your site delivers an
+            exceptional user experience, every time.
+          </p>
+          <a href="#test-form" class="btn-submit">Run a Free Test Now</a>
+        </div>
+      </section>
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const url = document.getElementById("url").value;
+      <section id="test-form" class="test-form-section">
+        <div class="container">
+          <div class="test-form-card">
+            <h2>Performance Test Runner</h2>
+            <p>
+              Enter a URL below to run a quick performance test and get
+              real-time insights.
+            </p>
+            <form id="jmeterForm">
+              <input
+                type="text"
+                id="url"
+                placeholder="Enter website URL (e.g. https://example.com)"
+                required
+              />
+              <button type="submit" class="btn-submit">
+                <i class="fas fa-rocket"></i> Run Test
+              </button>
+            </form>
+            <div id="output"></div>
+          </div>
+        </div>
+      </section>
 
-      outputDiv.innerHTML = `<div class="loading"><i class="fas fa-cog fa-spin"></i> Processing and analyzing performance...</div>`;
+      <section id="features" class="features-section">
+        <div class="container">
+          <h2>Why Performance Analyser?</h2>
+          <div class="features-grid">
+            <div class="feature-card">
+              <i class="fas fa-tachometer-alt"></i>
+              <h3>Blazing Fast</h3>
+              <p>
+                Get comprehensive performance metrics in seconds, not minutes.
+                Our optimized engine provides rapid feedback.
+              </p>
+            </div>
+            <div class="feature-card">
+              <i class="fas fa-chart-line"></i>
+              <h3>Detailed Reporting</h3>
+              <p>
+                Receive a full breakdown of total requests, success rates, and
+                errors to pinpoint exactly where performance issues exist.
+              </p>
+            </div>
+            <div class="feature-card">
+              <i class="fas fa-file-download"></i>
+              <h3>Downloadable Reports</h3>
+              <p>
+                Download a detailed CSV report of your test results for in-depth
+                analysis and sharing with your team.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
-      try {
-        const response = await fetch("/run", {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: "url=" + encodeURIComponent(url),
+      <section id="how-it-works" class="features-section">
+        <div class="container">
+          <h2>How It Works</h2>
+          <div class="features-grid">
+            <div class="feature-card">
+              <i class="fas fa-1"></i>
+              <h3>Enter URL</h3>
+              <p>
+                Simply paste the URL of the website or endpoint you want to test
+                into the field above.
+              </p>
+            </div>
+            <div class="feature-card">
+              <i class="fas fa-2"></i>
+              <h3>Run Test</h3>
+              <p>
+                Our server-side engine executes a rapid, simulated load test
+                against your URL.
+              </p>
+            </div>
+            <div class="feature-card">
+              <i class="fas fa-3"></i>
+              <h3>Analyze Results</h3>
+              <p>
+                Instantly view key performance metrics on the page or download
+                the full report for a detailed look.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container">
+        <p>
+          &copy; 2025 Performance Analyser. All rights reserved. |
+          <a href="#">Privacy Policy</a>
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      window.addEventListener("load", () => {
+        const loaderWrapper = document.getElementById("loader-wrapper");
+        loaderWrapper.classList.add("hidden");
+        loaderWrapper.addEventListener("transitionend", () => {
+          loaderWrapper.remove();
         });
+      });
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+      const form = document.getElementById("jmeterForm");
+      const outputDiv = document.getElementById("output");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const url = document.getElementById("url").value;
+
+        outputDiv.innerHTML = `<div class="loading"><i class="fas fa-cog fa-spin"></i> Processing and analyzing performance...</div>`;
+
+        try {
+          const response = await fetch("/run", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "url=" + encodeURIComponent(url),
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const result = await response.json();
+
+          if (result.status === "success") {
+            outputDiv.innerHTML = `<div class="results-card">
+           <h3 style="color:var(--color-secondary);">Test Complete</h3>
+           <div class="stats">
+             <p><b>Total Requests:</b> <span>${result.summary.total}</span></p>
+             <p><b>Success:</b> <span>${result.summary.success}</span></p>
+             <p><b>Errors:</b> <span>${result.summary.error}</span></p>
+             <p><b>Success Rate:</b> <span>${result.summary.success_rate}</span></p>
+           </div>
+           <canvas id="donutChart" style="max-width:350px;margin:20px auto;display:block;"></canvas>
+           <a class="download-link" href="${result.results_file}" download>
+             <i class="fas fa-download"></i> Download CSV Report
+           </a>
+        </div>`;
+
+            // ✅ Add Donut Chart
+            const ctx = document.getElementById("donutChart").getContext("2d");
+            new Chart(ctx, {
+              type: "doughnut",
+              data: {
+                labels: ["Success", "Errors"],
+                datasets: [
+                  {
+                    data: [result.summary.success, result.summary.error],
+                    // BUDDY MODIFICATION: Changed Success color to purple
+                    backgroundColor: ["#a24b91", "#ff5252"],
+                    borderWidth: 2,
+                    borderColor: "#0d0d1e",
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                plugins: {
+                  legend: { labels: { color: "#fff", font: { size: 14 } } },
+                },
+              },
+            });
+
+            // ✅ Add Line Chart (dummy response times)
+            const responseTimes = Array.from(
+              { length: result.summary.total },
+              () => Math.floor(Math.random() * 300) + 50
+            );
+            const ctxLine = document.createElement("canvas");
+            ctxLine.id = "lineChart";
+            // BUDDY MODIFICATION: Increased max-width for better visibility
+            ctxLine.style = "max-width:700px;margin:30px auto;display:block;"; 
+            document.querySelector(".results-card").appendChild(ctxLine);
+
+            new Chart(ctxLine, {
+              type: "line",
+              data: {
+                labels: responseTimes.map((_, i) => i + 1),
+                datasets: [
+                  {
+                    label: "Response Time (ms)",
+                    data: responseTimes,
+                    borderColor: "#764ba2",
+                    backgroundColor: "rgba(118,75,162,0.3)",
+                    tension: 0.4,
+                    fill: true,
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                plugins: {
+                  legend: { labels: { color: "#fff" } },
+                },
+                scales: {
+                  x: { ticks: { color: "#aaa" } },
+                  y: { ticks: { color: "#aaa" } },
+                },
+              },
+            });
+          } else {
+            outputDiv.innerHTML = `<div class="error-card">
+           <h3 class="error">Test Failed</h3>
+           <p class="error">${result.message}</p>
+         </div>`;
+          }
+        } catch (error) {
+          outputDiv.innerHTML = `<div class="error-card">
+         <h3 class="error">Connection Error</h3>
+         <p class="error">Could not connect to the server. Please try again later.</p>
+       </div>`;
+          console.error("Fetch error:", error);
         }
-
-        const result = await response.json();
-
-        if (result.status === "success") {
-          outputDiv.innerHTML =
-            `<div class="results-card">
-               <h3 style="color:var(--color-secondary);">Test Complete</h3>
-               <div class="stats">
-                 <p><b>Total Requests:</b> <span>${result.summary.total}</span></p>
-                 <p><b>Success:</b> <span>${result.summary.success}</span></p>
-                 <p><b>Errors:</b> <span>${result.summary.error}</span></p>
-                 <p><b>Success Rate:</b> <span>${result.summary.success_rate}</span></p>
-               </div>
-               <a class="download-link" href="${result.results_file}" download><i class="fas fa-download"></i> Download CSV Report</a>
-            </div>`;
-        } else {
-          outputDiv.innerHTML =
-            `<div class="error-card">
-               <h3 class="error">Test Failed</h3>
-               <p class="error">${result.message}</p>
-             </div>`;
-        }
-      } catch (error) {
-        outputDiv.innerHTML =
-          `<div class="error-card">
-             <h3 class="error">Connection Error</h3>
-             <p class="error">Could not connect to the server. Please try again later.</p>
-           </div>`;
-        console.error('Fetch error:', error);
-      }
-    });
-  </script>
-</body>
+      });
+    </script>
+  </body>
 </html>
